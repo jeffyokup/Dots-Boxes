@@ -5,9 +5,9 @@ import static java.lang.System.out;
 
 public class Game {
 
-    private Player playerTurn = Player.PLAYER_ONE;
-
     private Board board;
+
+    private final int depth = 9;
 
 
     public Game(int boxesPerRow, int boxesPerCol){
@@ -20,10 +20,10 @@ public class Game {
      */
     public Player startGame(){
 
-        while(!isGameOver()){
+        while(!board.isGameOver()){
             printBoard();
             getPlayerMove();
-            switchTurn();
+            board.switchTurn();
         }
         Player winningPlayer = getWinner();
         String champ = "";
@@ -43,23 +43,32 @@ public class Game {
      * @return Row Col
      */
     private void getPlayerMove(){
+        PlayerMove move = null;
+        Scanner scan = new Scanner(System.in);
+
         while(true){
-            Scanner scan = new Scanner(System.in);
-            System.out.println("Enter a move " + playerTurn + ": ");
-            String move = scan.nextLine();
-            String[] moveArray = move.split(" ");
-            if(!isValidMove(moveArray)){
-                out.println("Invalid Move.");
-                continue;
+            if(board.getPlayerTurn() == Player.PLAYER_ONE){
+                System.out.println("Enter a move " + board.getPlayerTurn() + ": ");
+                String input = scan.nextLine();
+                String[] moveArray = input.split(" ");
+                if(!isValidMove(moveArray)){
+                    out.println("Invalid Move.");
+                    continue;
+                }
+                int row = Integer.parseInt(moveArray[0]);
+                int col = Integer.parseInt(moveArray[1]);
+                Side side = charToSide(moveArray[2].charAt(0));
+                move = new PlayerMove(row, col, side, Player.PLAYER_ONE);
+            }else{
+                move = StickAI.getMove(board, depth);
             }
-            int row = Integer.parseInt(moveArray[0]);
-            int col = Integer.parseInt(moveArray[1]);
-            Side side = charToSide(moveArray[2].charAt(0));
-            boolean boxCompleted = board.getBox(row,col).setSide(playerTurn,side);
-            boolean neighborBoxCompleted = setNeighborBoxSide(row, col, playerTurn, side);
-            if(boxCompleted || neighborBoxCompleted){
+            System.out.println(board.getPlayerTurn() + " move: " + move);
+
+            boolean boxCompleted = board.setEdge(move.getRow(), move.getCol(), board.getPlayerTurn(), move.getSide()); // 1 1 r    1 1 l   0 1 r   0 1 b
+                                                                                                                       // 1 0 r    1 1 r   1 1 b   1 0 l
+            if(boxCompleted){
                 printBoard();
-                if(isGameOver())
+                if(board.isGameOver())
                     return;
                 continue;
             }
@@ -83,25 +92,6 @@ public class Game {
         }catch (Exception e){
             return false;
         }
-    }
-
-    private void switchTurn(){
-        if(playerTurn == Player.PLAYER_ONE){
-            playerTurn = Player.PLAYER_TWO;
-        }else{
-            playerTurn = Player.PLAYER_ONE;
-        }
-    }
-
-
-    public boolean isGameOver(){
-        for(int row = 0; row < board.getNumberOfRows(); row++){
-            for(int col = 0; col < board.getNumberOfCols(); col++){
-                if(board.getBox(row,col).getBoxOwner() == Player.NO_PLAYER)
-                    return false;
-            }
-        }
-        return true;
     }
 
     public Player getWinner(){
@@ -192,6 +182,7 @@ public class Game {
             }
             out.println();
         }
+        out.println();
     }
 
     private Side charToSide(char c){
@@ -209,74 +200,4 @@ public class Game {
                 throw new RuntimeException("Invalid move character.");
         }
     }
-
-    private boolean setNeighborBoxSide(int row, int col, Player player, Side side){
-        if((side == Side.TOP && row == 0) || (side == Side.LEFT && col == 0) || (side == Side.BOTTOM && row == (board.getNumberOfRows()-1)) || (side == Side.RIGHT && col == board.getNumberOfCols()-1) ){
-            return false;
-        }
-
-        //Get the new row/col of the neighbor box.
-        int newRow = row;
-        int newCol = col;
-
-        if(side == Side.TOP){
-            newRow--;
-        }else if(side == Side.LEFT){
-            newCol--;
-        }else if(side == Side.BOTTOM){
-            newRow++;
-        }else if(side == Side.RIGHT){
-            newCol++;
-        }else{
-            throw new RuntimeException("Enum Exception");
-        }
-        Side newSide = null;
-
-        // Grab the other side of the neighbor box.
-        switch (side){
-            case TOP:
-                newSide = Side.BOTTOM;
-                break;
-            case LEFT:
-                newSide = Side.RIGHT;
-                break;
-            case BOTTOM:
-                newSide = Side.TOP;
-                break;
-            case RIGHT:
-                newSide = Side.LEFT;
-                break;
-            default:
-                throw new RuntimeException("Error with enum.");
-        }
-        return board.getBox(newRow,newCol).setSide(player, newSide);
-    }
-
-    public ArrayList<PlayerMove> getAvailableMoves(){
-        ArrayList<PlayerMove> availableMoves = new ArrayList<PlayerMove>();
-        Side[] sides = {Side.TOP, Side.LEFT, Side.BOTTOM, Side.RIGHT};
-
-        for(int row = 0; row < board.getNumberOfRows(); row++){
-            Box[] boxRow = board.getBoxRow(row);
-            for(int col = 0; col< board.getNumberOfCols(); col++){
-                Box currentBox = boxRow[col];
-
-                // Iterate through all available sides.
-                for(int i = 0; i < 4; i++){
-                    Side side = sides[i];
-                    Player owner = currentBox.getOwnerOfSide(side);
-                    if(owner != Player.NO_PLAYER){
-                        availableMoves.add(new PlayerMove(row, col, side));
-                    }
-                }
-            }
-        }
-
-        // TODO - Now remove duplicate moves.
-        // TODO - Now remove duplicate moves.
-        // TODO - Now remove duplicate moves.
-        // TODO - Now remove duplicate moves.
-        return availableMoves;
-    }
-
 }

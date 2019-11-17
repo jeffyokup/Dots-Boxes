@@ -15,6 +15,11 @@ public class Box {
         Arrays.fill(sides, Player.NO_PLAYER);
     }
 
+    public Box(Player owner, Player[] sides){
+        System.arraycopy(sides, 0, this.sides, 0, sides.length);
+        this.owner = owner;
+    }
+
     /**
      * Fills in the given side of this box.
      * @param player
@@ -23,7 +28,7 @@ public class Box {
      */
     public boolean setSide(Player player, Side side){
         if(player == null || side == null || player == Player.NO_PLAYER || owner != Player.NO_PLAYER){
-            throw new IllegalArgumentException("Invalid argument to setSide:" + player + " " + side);
+            throw new IllegalArgumentException("Invalid argument to setSide:" + player + " " + side + Arrays.toString(sides));
         }
 
         switch (side){
@@ -101,6 +106,20 @@ public class Box {
             return true;
         }
         return false;
+    }
+
+    public boolean oneMoreSideLeft(){
+        int sidesFilled = 0;
+        for(int i = 0; i < 4; i++){
+            if(sides[i] != Player.NO_PLAYER){
+                sidesFilled++;
+            }
+        }
+        return (sidesFilled == 3);
+    }
+
+    public Box clone(){
+        return new Box(owner, sides);
     }
 
 }
