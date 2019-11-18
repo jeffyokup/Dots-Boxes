@@ -1,20 +1,20 @@
 import java.util.ArrayList;
 import java.util.Random;
 
-public class StickAI {
-
-    public StickAI(){
-
-    }
+class StickAI {
 
     private static Random rand = new Random();
 
-    public static PlayerMove getMove(Board board, int depth){
+    private static boolean movesRandomized;
+
+    private static int alpha_beta_depth;
+
+    public static PlayerMove getMove(final Board board){
         Board boardClone = board.clone();
-        return getMove(boardClone, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true, null);
+        return getMove(boardClone, alpha_beta_depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true, null);
     }
 
-    private static PlayerMove getMove(Board node, int depth, int alpha, int beta, boolean maximizingPlayer, PlayerMove move){
+    private static PlayerMove getMove(final Board node, final int depth, int alpha, int beta, final boolean maximizingPlayer, final PlayerMove move){
         ArrayList<PlayerMove> potentialMoves = node.getAvailableMoves();
         if(depth == 0 || node.isGameOver() || potentialMoves.size() == 0){
             move.setBoardValue(node.getValueOfBoardState());
@@ -71,5 +71,13 @@ public class StickAI {
             }
             return bestMove;
         }
+    }
+
+    public static void setMovesRandomized(final boolean randomize){
+        movesRandomized = randomize;
+    }
+
+    public static void setDepth(final int depthToSet){
+        alpha_beta_depth = depthToSet;
     }
 }

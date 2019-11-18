@@ -1,8 +1,11 @@
 public class PlayerMove {
 
-    private int row, col, boardValue;
-    private Side side;
-    private Player player;
+    private final int row;
+    private final int col;
+    private final Side side;
+    private final Player player;
+
+    private int boardValue;
 
     public PlayerMove(int row, int col, Side side, Player player){
         this.row = row;
@@ -11,7 +14,7 @@ public class PlayerMove {
         this.player = player;
     }
 
-    public PlayerMove(PlayerMove move){
+    private PlayerMove(PlayerMove move){
         this(move.getRow(), move.getCol(), move.getSide(), move.getPlayer());
         setBoardValue(move.getBoardValue());
     }

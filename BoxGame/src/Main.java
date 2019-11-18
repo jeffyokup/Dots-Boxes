@@ -1,23 +1,27 @@
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
 
-public class Main {
+class Main {
 
-    public static void main(String[] args) throws IOException {
-        Game game = new Game(1, 1);
-        //Player winningPlayer = game.startGame();
-        //logWin(winningPlayer);
-        logWin(Player.PLAYER_TWO);
+    public static void main(String[] args) {
+        final int depth = 4;
+        final boolean movesRandomized = true;
+        Game game = new Game(3, 3, depth, movesRandomized);
+        Player winningPlayer = game.startGame();
+        logWin(winningPlayer);
     }
 
-    private static void logWin(Player winningPlayer) throws IOException {
+    // TODO Implement BEAM search if in early game.
+
+    private static void logWin(final Player winningPlayer) {
+//        String os = System.getProperty("os.name");
+//        System.out.println(os);
         String filePath = "/home/jeff/Desktop/Programming/Lines&Dots/winner_log";
         File file = new File(filePath);
 
@@ -31,7 +35,7 @@ public class Main {
             FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(date);
-            bw.write(" " + String.valueOf(winningPlayer));
+            bw.write(" " + winningPlayer);
             bw.newLine();
             bw.close();
             fw.close();

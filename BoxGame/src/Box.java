@@ -7,7 +7,7 @@ public class Box {
     * 2 -> Bottom
     * 3 -> Right
      */
-    private Player[] sides = new Player[4];
+    private final Player[] sides = new Player[4];
 
     private Player owner = Player.NO_PLAYER;
 
@@ -15,18 +15,18 @@ public class Box {
         Arrays.fill(sides, Player.NO_PLAYER);
     }
 
-    public Box(Player owner, Player[] sides){
+    private Box(Player owner, Player[] sides){
         System.arraycopy(sides, 0, this.sides, 0, sides.length);
         this.owner = owner;
     }
 
     /**
      * Fills in the given side of this box.
-     * @param player
-     * @param side
+     * @param player The player who wants to set the given side.
+     * @param side The side going to be set.
      * @return true if the move completed the box. False otherwise.
      */
-    public boolean setSide(Player player, Side side){
+    public boolean setSide(final Player player, final Side side){
         if(player == null || side == null || player == Player.NO_PLAYER || owner != Player.NO_PLAYER){
             throw new IllegalArgumentException("Invalid argument to setSide:" + player + " " + side + Arrays.toString(sides));
         }
@@ -67,7 +67,7 @@ public class Box {
         return checkBoxCompletion(player);
     }
 
-    public Player getOwnerOfSide(Side side){
+    public Player getOwnerOfSide(final Side side){
         switch (side){
             case TOP:
                 return sides[0];
@@ -91,10 +91,10 @@ public class Box {
      *
      * Returns true if the box just got completed.
      * False otherwise.
-     * @param player
+     * @param player The player to set as owner of box if box just got completed.
      * @return True if box got completed.
      */
-    public boolean checkBoxCompletion(Player player){
+    private boolean checkBoxCompletion(final Player player){
         int sidesCompleted = 0;
         for(int i = 0; i < 4; i++){
             if(sides[i] != Player.NO_PLAYER) {

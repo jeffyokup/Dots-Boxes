@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Board {
 
@@ -22,13 +21,13 @@ public class Board {
      *  *-*
      *
      */
-    private Box[][] board;
+    private final Box[][] board;
 
     private int edgesLeft = 0;
 
     private Player playerTurn = Player.PLAYER_ONE;
 
-    public Board(int boxesPerRow, int boxesPerCol){
+    public Board(final int boxesPerRow, final int boxesPerCol){
         board = new Box[boxesPerRow][boxesPerCol];
 
         for(int row = 0; row < boxesPerRow; row++){
@@ -43,7 +42,7 @@ public class Board {
         edgesLeft += (edgesPerRowExcludingTop * boxesPerRow);
     }
 
-    public Board(Board board){
+    private Board(final Board board){
         this.edgesLeft = board.getEdgesLeft();
         this.playerTurn = board.getPlayerTurn();
 
@@ -58,7 +57,7 @@ public class Board {
 
     /**
      * Returns player one score - player two score.
-     * @return
+     * @return the value of the board state.
      */
     public int getValueOfBoardState(){
         int playerOneScore = 0;
@@ -86,8 +85,6 @@ public class Board {
         }
 
         int boardValue = playerTwoScore - playerOneScore;
-        // -3 On Player_TWO turn
-
         boardValue = (playerTurn == Player.PLAYER_ONE) ? (boardValue - numBoxesAlmostCompleted) : (boardValue + numBoxesAlmostCompleted);
         return boardValue;
     }
@@ -113,7 +110,7 @@ public class Board {
     }
 
     public ArrayList<PlayerMove> getAvailableMoves(){
-        ArrayList<PlayerMove> availableMoves = new ArrayList<PlayerMove>();
+        ArrayList<PlayerMove> availableMoves = new ArrayList<>();
 
         // Check top row.
         Box[] boxRow = getBoxRow(0);
@@ -181,7 +178,7 @@ public class Board {
         }else{
             throw new RuntimeException("Enum Exception");
         }
-        Side newSide = null;
+        Side newSide;
 
         // Grab the other side of the neighbor box.
         switch (side){
@@ -207,7 +204,7 @@ public class Board {
         return (edgesLeft == 0);
     }
 
-    public int getEdgesLeft(){ return edgesLeft; }
+    private int getEdgesLeft(){ return edgesLeft; }
 
     public boolean executeMove(PlayerMove move){
         return setEdge(move.getRow(), move.getCol(), move.getPlayer(), move.getSide());
@@ -219,26 +216,6 @@ public class Board {
         }else{
             playerTurn = Player.PLAYER_ONE;
         }
-    }
-
-    /**
-     * Returns playerOne Score - playerTwo Score.
-     * @return
-     */
-    public int getScoreDiff(){
-        int scoreDiff = 0;
-
-        for(int row = 0; row < getNumberOfRows(); row++){
-            for(int col = 0; col < getNumberOfCols(); col++){
-                Box box = board[row][col];
-                if(box.getBoxOwner() == Player.PLAYER_ONE){
-                    scoreDiff++;
-                }else if(box.getBoxOwner() == Player.PLAYER_TWO){
-                    scoreDiff--;
-                }
-            }
-        }
-        return scoreDiff;
     }
 
     public Player getPlayerTurn(){
